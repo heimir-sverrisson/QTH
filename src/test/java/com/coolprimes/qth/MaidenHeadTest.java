@@ -105,4 +105,64 @@ public class MaidenHeadTest {
         assertEquals(89.5, p.getLatitude(), 0.01);
         assertEquals(179.0, p.getLongitude(), 0.01);
     }
+
+    @Test
+    public void testDistanceAndBearingArguments(){
+        try{
+            DistanceAndBearing d = new DistanceAndBearing(-0.001, 100.0);
+        } catch(IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Distance cannot be negative");
+        }
+        try{
+            DistanceAndBearing d = new DistanceAndBearing(0.001, -0.001);
+        } catch(IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Bearing must be in [0.0 - 360.0]");
+        }
+        try{
+            DistanceAndBearing d = new DistanceAndBearing(0.001, 360.001);
+        } catch(IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Bearing must be in [0.0 - 360.0]");
+        }
+    }
+
+    @Test
+    public void testDistanceAndBearingValues(){
+        double distance = 100234.45;
+        double bearing = 172.45;
+        DistanceAndBearing d = new DistanceAndBearing(distance, bearing);
+        assertEquals(distance, d.getDistance(), 0.00001);
+        assertEquals(bearing, d.getBearing(), 0.00001);
+    }
+
+    @Test
+    public void testDistanceAndBearingGridPoints(){
+        DistanceAndBearing db = QTH.distanceAndBearing("DN70ja", "DN70ka");
+        double distance = db.getDistance();
+        double bearing  = db.getBearing();
+        assertEquals(7.0, distance, 0.1);
+        assertEquals(90.0, bearing, 0.1);
+        db = QTH.distanceAndBearing("DN70ka", "DN70ja");
+        distance = db.getDistance();
+        bearing  = db.getBearing();
+        assertEquals(7.0, distance, 0.1);
+        assertEquals(270.0, bearing, 0.1);
+        // To New Hampshire from Boulder
+        db = QTH.distanceAndBearing("DN70ja", "FN42hv");
+        distance = db.getDistance();
+        bearing  = db.getBearing();
+        assertEquals(2820.0, distance, 5.0);
+        assertEquals(72.3, bearing, 1.0);
+        // From Boulder to Brazil
+        db = QTH.distanceAndBearing("DN70ja", "GG66qw");
+        distance = db.getDistance();
+        bearing  = db.getBearing();
+        assertEquals(9274.0, distance, 5.0);
+        assertEquals(128.0, bearing, 1.0);
+        // From Boulder to Reykjavik, Iceland
+        db = QTH.distanceAndBearing("DN70ja", "hp94bc");
+        distance = db.getDistance();
+        bearing  = db.getBearing();
+        assertEquals(5771.0, distance, 5.0);
+        assertEquals(33.0, bearing, 1.0);
+    }
 }

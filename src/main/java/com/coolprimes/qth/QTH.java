@@ -89,7 +89,6 @@ public class QTH {
      * @param pointB is the other point
      * @return the distance between the points in kilometers
      */
-
     public static double distance(Coordinates pointA, Coordinates pointB){
         double R = 6371; //radius of earth in km
         double theta1 = toRadians(pointA.getLatitude());
@@ -113,11 +112,25 @@ public class QTH {
         double deltaLambda = toRadians(pointB.getLongitude() - pointA.getLongitude());
         double theta1 = toRadians(pointA.getLatitude());
         double theta2 = toRadians(pointB.getLatitude());
-        double y = Math.sin(deltaLambda) * Math.cos(pointB.getLatitude());
+        double y = Math.sin(deltaLambda) * Math.cos(theta2);
         double x = Math.cos(theta1) * Math.sin(theta2) -
                    Math.sin(theta1) * Math.cos(theta2) * Math.cos(deltaLambda);
         double deg = toDegrees(Math.atan2(y,x));
         return (deg < 0.0) ? 360.0 + deg : deg;
+    }
+
+    /**
+     * Compute the distance and bearing from someone in gridA to someone in gridB
+     * @param gridA is the Maidenhead grid square (4 or 6 characters) for the reference point
+     * @param gridB is the same for the destination point
+     * @return the distance (km) and bearing (deg) from A to B
+     */
+    public static DistanceAndBearing distanceAndBearing(String gridA, String gridB){
+        Coordinates pointA = midpoint(gridA);
+        Coordinates pointB = midpoint(gridB);
+        double distance = distance(pointA, pointB);
+        double bearing = bearing(pointA, pointB);
+        return new DistanceAndBearing(distance, bearing);
     }
     /**
      *  Alias for the method using coordinates
