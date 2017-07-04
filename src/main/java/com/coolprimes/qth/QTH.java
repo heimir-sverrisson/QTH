@@ -1,6 +1,8 @@
 package com.coolprimes.qth;
-
-class QTH {
+/**
+ * Conversion and calculation class for location on earth
+ */
+public class QTH {
     private static final int valueUpperA = (int)'A';
     private static final int value0 = (int)'0';
     private static final int value9 = (int)'9';
@@ -51,6 +53,8 @@ class QTH {
 
     /**
      * Return the coordinates (lat/long) of the midpoint of a Maidenhead square
+     * @param square is a four or six character Maidenhead square string
+     * @return the coordinates of the midpoint of the square
      */
     public static Coordinates midpoint(String square){
         square = square.toLowerCase();
@@ -66,12 +70,13 @@ class QTH {
         offset = 1.0 * ((int)square.charAt(3) - value0);
         latitude += offset;
         if(square.length() == 6){
+            // Final offsets need to center in the square
             offset = 1.0/12 * ((int)square.charAt(4) - valueA) + 1.0/24;
             longitude += offset;
             offset = 1.0/24 * ((int)square.charAt(5) - valueA) + 1.0/48;
             latitude += offset;
         } else {
-            longitude += 1.0; // Center within the square
+            longitude += 1.0; // Center within the square for short form
             latitude  += 0.5;
         }
         return new Coordinates(latitude, longitude);
@@ -79,7 +84,10 @@ class QTH {
 
     /**
      * Use the Haversine formula to calculate the great-circle distance in kilometers
-     * From: http://www.movable-type.co.uk/scripts/latlong.html
+     * (from: http://www.movable-type.co.uk/scripts/latlong.html)
+     * @param pointA is the reference point
+     * @param pointB is the other point
+     * @return the distance between the points in kilometers
      */
 
     public static double distance(Coordinates pointA, Coordinates pointB){
@@ -96,7 +104,10 @@ class QTH {
     }
     /**
      * Return the bearing from pointA to pointB
-     * From: http://www.movable-type.co.uk/scripts/latlong.html
+     * (from: http://www.movable-type.co.uk/scripts/latlong.html)
+     * @param pointA is the reference point
+     * @param pointB is the other point
+     * @return the angle from pointA to pointB in degress [0.0 - 360.0] 
      */
     public static double bearing(Coordinates pointA, Coordinates pointB){
         double deltaLambda = toRadians(pointB.getLongitude() - pointA.getLongitude());
@@ -110,12 +121,19 @@ class QTH {
     }
     /**
      *  Alias for the method using coordinates
+     * @param latitude of the point in question
+     * @param longitude of the point in question
+     * @param precision is either 4 or 6 indicating the number of characters in the Maidenhead string
+     * @return the Maidenhead square string for the coordinates
      */
     public static String toGrid(double latitude, double longitude, int precision){
         return toGrid(new Coordinates(latitude, longitude), precision);
     }
     /**
      * Main method to calculate grid string from lat/lon coordinates
+     * @param coordinates is the lat/long of the point in question
+     * @param precision is either 4 or 6 indicating the number of characters in the Maidenhead string
+     * @return the Maidenhead square string for the coordinates
      */
     public static String toGrid(Coordinates coordinates, int precision){
         if(precision != 4 && precision !=6){
